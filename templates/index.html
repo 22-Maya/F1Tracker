@@ -1,47 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>F1 Calendar</title>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>F1 Calendar</title>
 
-        <!-- serve stylesheet from Flask static/ -->
-        <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+      <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
 
-    </head>
-    <body>
+  <body>
 
-        <nav class="top-vertical-nav" aria-label="Main navigation">
-            <a href="{{ url_for('index') }}" class="active"><span class="icon">🏁</span>Home</a>
-            <a href="{{ url_for('schedule') }}"><span class="icon">📅</span>Race Schedule</a>
-            <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
-        </nav>
+    <nav class="top-vertical-nav" aria-label="Main navigation">
+        <a href="{{ url_for('index') }}" class="active"><span class="icon">🏁</span>Home</a>
+        <a href="{{ url_for('schedule') }}"><span class="icon">📅</span>Race Schedule</a>
+        <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
+    </nav>
 
-        <main class="main" role="main">
-            <header class="card" style="margin-bottom:18px;">
-                <h1>F1 Calendar {{ year }}</h1>
-                <p class="lead">Season schedule — click a race to view details or open the Track of the Week.</p>
-            </header>
+    <div id="timezoneSelector" class="tz-wrapper">
+        <select id="timezoneSelect">
+            <option value="America/New_York" selected>EST</option>
+            <option value="America/Chicago">CST</option>
+            <option value="America/Denver">MST</option>
+            <option value="America/Los_Angeles">PST</option>
 
-            <section class="content-grid">
-                <div class="card">
-                    <h2>Leaderboards</h2>
-                    <p class="lead">This site provides an overview of the current Formula 1 season schedule, built using <a href="https://fastf1.readthedocs.io/en/latest/" target="_blank" rel="noopener">FastF1</a> and <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener">Flask</a>.</p>
-                    <p>Use the navigation on the left to explore upcoming races and other features.</p>
+            <option value="Europe/London">GMT</option>
+            <option value="Europe/Paris">CET</option>
+            <option value="Europe/Berlin">CET</option>
+
+            <option value="Asia/Kolkata">IST</option>
+            <option value="Asia/Dubai">GST</option>
+            <option value="Asia/Singapore">SGT</option>
+            <option value="Asia/Tokyo">JST</option>
+
+            <option value="Australia/Sydney">AEDT</option>
+        </select>
+    </div>
+
+    <main class="main" role="main">
+        <header class="card" style="margin-bottom:18px;">
+            <h1>F1 Calendar {{ year }}</h1>
+            <p class="lead">Season schedule — click a race to view details or open the Track of the Week.</p>
+        </header>
+
+        <section class="content-grid">
+            <div class="card">
+                <h2>Leaderboards</h2>
+                <p class="lead">This site provides an overview of the current Formula 1 season schedule, built using
+                    <a href="https://fastf1.readthedocs.io/en/latest/" target="_blank" rel="noopener">FastF1</a>
+                    and <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener">Flask</a>.
+                </p>
+                <p>Use the navigation on the left to explore upcoming races and other features.</p>
+            </div>
+
+            <div class="card">
+                <h2>Quick Actions</h2>
+                <p class="lead">Open the next race or view the current Track of the Week.</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <a href="{{ url_for('schedule') }}" class="pill">{{ year }} Schedule</a>
+                    <a href="{{ url_for('next_race') }}" class="pill">Next Race</a>
+                    <a href="#" class="pill">About</a>
                 </div>
-
-                <div class="card">
-                    <h2>Quick Actions</h2>
-                    <p class="lead">Open the next race or view the current "Track of the Week".</p>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <a href="{{ url_for('schedule') }}" class="pill">{{ year }} Schedule</a>
-                        <a href="{{ url_for('next_race') }}" class="pill">Next Race</a>
-                        <a href="#" class="pill">About</a>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-    </body>
+            </div>
+        </section>
+    </main>
+  </body>
 </html>

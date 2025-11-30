@@ -183,3 +183,48 @@ h1,h2,h3{ margin:0 0 8px 0; color: #fff; letter-spacing: -0.02em; }
   }
   .main{ padding-top:80px; }
 }
+
+#timezone-selector {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    background: var(--surface);
+    padding: 6px 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.25);
+    z-index: 1000;
+}
+#timezone-selector select {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.tz-wrapper{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+
+    background: var(--glass);
+    backdrop-filter: blur(var(--glass-blur));
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.tz-wrapper select{
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.tz-wrapper select:hover{
+    color: #fff;
+}

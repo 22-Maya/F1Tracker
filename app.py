@@ -24,7 +24,10 @@ def index():
 @app.route("/schedule")
 def schedule():
     schedule, year = load_calendar()
-    return render_template("schedule.html", schedule=schedule.to_dict(orient="records"), year=year)
+    schedule["date_utc"] = pd.to_datetime(schedule["Session1DateUtc"], utc=True)
+    return render_template("schedule.html", year=year, schedule=schedule.assign(
+        date_iso=schedule["date_utc"].dt.strftime("%Y-%m-%dT%H:%M:%SZ")).to_dict(orient="records")
+    )
 
 @app.route("/next")
 def next_race():
