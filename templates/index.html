@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>F1 Calendar</title>
+
+    <!-- serve stylesheet from Flask static/ -->
+    <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
+</head>
+<body>
+
+<nav class="top-vertical-nav" aria-label="Main navigation">
+  <a href="{{ url_for('index') }}" class="active"><span class="icon">🏁</span>Home</a>
+  <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
+</nav>
+
+<main class="main" role="main">
+  <header class="card" style="margin-bottom:18px;">
+    <h1>F1 Calendar {{ year }}</h1>
+    <p class="lead">Season schedule — click a race to view details or open the Track of the Week.</p>
+  </header>
+
+  <section class="content-grid">
+    <div class="card">
+      <h2>Upcoming Races</h2>
+      <div class="kv" style="margin-bottom:10px;">
+        <span class="pill">Total: {{ schedule|length }}</span>
+        <span class="kv" style="margin-left:auto;color:var(--muted);font-size:0.9rem;">Year: {{ year }}</span>
+      </div>
+
+      <div style="overflow:auto;">
+      <table class="race-table" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="text-align:left;color:var(--muted);font-size:0.9rem;">
+            <th style="padding:8px 10px">Event</th>
+            <th style="padding:8px 10px">Country</th>
+            <th style="padding:8px 10px">Date</th>
+            <th style="padding:8px 10px"></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for row in schedule %}
+          <tr style="border-top:1px solid rgba(255,255,255,0.02);">
+            <td style="padding:10px 8px;font-weight:600">{{ row.EventName }}</td>
+            <td style="padding:10px 8px;color:var(--muted)">{{ row.Country }}</td>
+            <td style="padding:10px 8px;color:var(--muted)">{{ row.EventDate }}</td>
+            <td style="padding:10px 8px;text-align:right;">
+              <!-- temporary: route not implemented for per-race pages -->
+              <a href="#" class="pill" style="text-decoration:none;color:inherit;">View</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Quick Actions</h2>
+      <p class="lead">Open the next race or view the current "Track of the Week".</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{{ url_for('next_race') }}" class="pill">Next Race</a>
+        <a href="{{ url_for('next_race') }}" class="pill">Track of the Week</a>
+        <a href="#" class="pill">About</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <small>Built with FastF1 · F1Tracker</small>
+  </footer>
+</main>
+
+</body>
+</html>

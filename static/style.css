@@ -1,0 +1,185 @@
+/* Theme vars */
+:root{
+  --bg-1: #0f1724;
+  --bg-2: #071022;
+  --card: rgba(255,255,255,0.04);
+  --accent: #ff4655;
+  --muted: #9aa6b2;
+  --glass: rgba(255,255,255,0.06);
+  --radius: 12px;
+  --glass-blur: 6px;
+}
+
+/* Page background */
+html,body{
+  height:100%;
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  color:#9ecfff;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Top-centered horizontal nav (replaces previous vertical layout) */
+.top-vertical-nav{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:row;        /* horizontal by default */
+  gap:8px;
+  background:var(--glass);
+  backdrop-filter: blur(var(--glass-blur));
+  padding:8px;
+  border-radius:999px;      /* pill shape */
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  z-index:999;
+}
+
+/* Links in the nav */
+.top-vertical-nav a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:700;
+  font-size:0.95rem;
+  border-radius:999px;
+  transition: all 180ms ease;
+  position:relative; /* needed for the active indicator pseudo-element */
+  overflow:visible;
+}
+
+/* small icon style */
+.top-vertical-nav a .icon{
+  width:22px;
+  height:22px;
+  display:inline-grid;
+  place-items:center;
+  border-radius:6px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,0,0,0.08));
+  color:var(--accent);
+  font-size:0.9rem;
+}
+
+/* Hover / focus */
+.top-vertical-nav a:hover,
+.top-vertical-nav a:focus{
+  transform: translateY(-2px) scale(1.01);
+  color:#fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
+
+/* Active link visual — pill highlight + bottom accent bar */
+.top-vertical-nav a.active{
+  color:#fff;
+  background: linear-gradient(90deg, rgba(255,70,85,0.12), rgba(255,70,85,0.03));
+  box-shadow: 0 8px 30px rgba(255,70,85,0.06), 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.top-vertical-nav a.active::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:-8px;
+  height:4px;
+  border-radius:4px;
+  background: linear-gradient(90deg, var(--accent), #ff9aa0);
+  box-shadow: 0 6px 18px rgba(255,70,85,0.18);
+}
+
+/* Ensure nav space doesn't hide content */
+.main{
+  padding-top:110px; /* adjust if you change nav height */
+  max-width:1100px;
+  margin:0 auto;
+  padding-left:20px;
+  padding-right:20px;
+}
+
+/* Grid content area & cards */
+.content-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap:20px;
+  align-items:start;
+}
+
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: var(--radius);
+  padding:16px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+  border: 1px solid rgba(255,255,255,0.02);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(2,6,23,0.7);
+}
+
+/* Headings & small helpers */
+h1,h2,h3{ margin:0 0 8px 0; color: #fff; letter-spacing: -0.02em; }
+.lead{ color:var(--muted); margin-bottom:12px; }
+
+.kv{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+/* Cute accent pill */
+.pill{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.02);
+  color:var(--muted);
+  font-weight:600;
+  font-size:0.85rem;
+}
+
+/* Footer */
+.site-footer{
+  margin-top:32px;
+  padding:20px 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:0.9rem;
+}
+
+/* Responsive: on small screens switch to a compact vertical nav on the left */
+@media (max-width:640px){
+  .top-vertical-nav{
+    left:12px;
+    transform:none;
+    top:12px;
+    flex-direction:column;   /* stack vertically on mobile */
+    padding:8px;
+    border-radius:12px;
+  }
+  .top-vertical-nav a{
+    padding:8px 10px;
+    font-size:0.92rem;
+  }
+  /* move the active accent to a left indicator for compact nav */
+  .top-vertical-nav a.active::after{
+    left:6px;
+    top:6px;
+    bottom:6px;
+    right:auto;
+    width:4px;
+    height:calc(100% - 12px);
+    border-radius:4px;
+  }
+  .main{ padding-top:80px; }
+}
