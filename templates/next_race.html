@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Next F1 Race</title>
-    <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Next F1 Race</title>
+        <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-</head>
-<body>
+    </head>
+    <body>
 
-<nav class="top-vertical-nav" aria-label="Main navigation">
-  <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
-  <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Track of the Week</a>
-</nav>
+        <nav class="top-vertical-nav" aria-label="Main navigation">
+            <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
+            <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Track of the Week</a>
+        </nav>
 
-<main class="main" role="main">
-  <section class="card" style="max-width:720px;margin:24px auto;">
-    <h1>Next Race ({{ year }})</h1>
-    <h2 style="margin-top:8px;">{{ event['EventName'] }}</h2>
-    <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ event['Country'] }}</span></p>
-    <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get('Location','—') }}</span></p>
-    <p class="kv"><strong>Date:</strong>&nbsp;<span style="color:var(--muted)">{{ event['EventDate'] }}</span></p>
+        <main class="main" role="main">
+            <section class="card" style="max-width:720px;margin:24px auto;">
+                <h1>Next Race ({{ year }})</h1>
+                <h2 style="margin-top:8px;">{{ event['EventName'] }}</h2>
+                <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ event['Country'] }}</span></p>
+                <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get('Location','—') }}</span></p>
+                <p class="kv"><strong>Date:</strong>&nbsp;<span style="color:var(--muted)">{{ event['EventDate'] }}</span></p>
 
-    <div style="margin-top:16px;">
-      <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
-      <a href="#" class="pill" style="margin-left:8px;">Open Track</a>
-    </div>
-  </section>
-</main>
+                <div style="margin-top:16px;">
+                    <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
+                    <a href="#" class="pill" style="margin-left:8px;">Open Track</a>
+                </div>
+            </section>
+        </main>
 
-</body>
+    </body>
 </html>

@@ -21,6 +21,11 @@ def index():
     schedule, year = load_calendar()
     return render_template("index.html", schedule=schedule.to_dict(orient="records"), year=year)
 
+@app.route("/schedule")
+def schedule():
+    schedule, year = load_calendar()
+    return render_template("schedule.html", schedule=schedule.to_dict(orient="records"), year=year)
+
 @app.route("/next")
 def next_race():
     schedule, year = load_calendar()
