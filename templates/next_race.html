@@ -41,14 +41,12 @@
               <h1>Next Race ({{ year }})</h1>
               <h2 style="margin-top:8px;">{{ event["EventName"] }}</h2>
 
-              <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ event["Country"] }}</span></p>
+              <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ get_flag(event["Country"]) }} {{ event["Country"] }}</span></p>
               <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get("Location", "—") }}</span></p>
 
               <p class="kv">
                   <strong>Date:</strong>&nbsp;
-                  <span class="race-date" data-utc="{{ event['EventDate'] }}" style="color:var(--muted)">
-                      {{ event["EventDate"] }}
-                  </span>
+                  <span class="race-date" data-utc="{{ event.get('date_utc', event['EventDate']) }}" style="color:var(--muted)"></span>
               </p>
 
               <div style="margin-top:16px;">
@@ -59,21 +57,34 @@
       </main>
 
       <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+
       <script>
-          const DateTime = luxon.DateTime;
+          function convertAllTimes() {
+              const tz = document.getElementById("timezoneSelect").value;
+              const cells = document.querySelectorAll(".race-date");
 
-          function updateTimes() {
-              const tz = document.getElementById("timezone").value;
+              cells.forEach(cell => {
+                  const utcTime = cell.getAttribute("data-utc");
+                  const date = new Date(utcTime);
 
-              document.querySelectorAll(".race-date").forEach(span => {
-                  const utc = span.dataset.utc;
-                  const dt = DateTime.fromISO(utc, { zone: "utc" }).setZone(tz);
-                  span.textContent = dt.toFormat("yyyy-LL-dd HH:mm");
+                  const options = {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      timeZone: tz
+                  };
+
+                  const formatted = date.toLocaleString("en-US", options);
+                  cell.textContent = formatted;
               });
           }
 
-          updateTimes();
-          document.getElementById("timezone").addEventListener("change", updateTimes);
+          document.getElementById("timezoneSelect").addEventListener("change", convertAllTimes);
+
+          // Run on page load
+          convertAllTimes();
       </script>
 
   </body>

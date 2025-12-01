@@ -65,7 +65,7 @@
                                 {% for row in schedule %}
                                 <tr style="border-top:1px solid rgba(255,255,255,0.02);">
                                     <td style="padding:10px 8px;font-weight:600">{{ row.EventName }}</td>
-                                    <td style="padding:10px 8px;color:var(--muted)">{{ row.Country }}</td>
+                                    <td style="padding:10px 8px;color:var(--muted)">{{ get_flag(row.Country) }} {{ row.Country }}</td>
 
                                     <!-- Store UTC version -->
                                     <td class="race-date" data-utc="{{ row.date_utc }}" style="padding:10px 8px;color:var(--muted)"></td>
