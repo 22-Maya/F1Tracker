@@ -12,7 +12,7 @@
 
     <nav class="top-vertical-nav" aria-label="Main navigation">
         <a href="{{ url_for('index') }}" class="active"><span class="icon">🏁</span>Home</a>
-        <a href="{{ url_for('schedule') }}"><span class="icon">📅</span>Race Schedule</a>
+        <a href="{{ url_for('schedule_page') }}"><span class="icon">📅</span>Race Schedule</a>
         <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
     </nav>
 
@@ -56,7 +56,7 @@
                 <h2>Quick Actions</h2>
                 <p class="lead">Open the next race or view the current Track of the Week.</p>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <a href="{{ url_for('schedule') }}" class="pill">{{ year }} Schedule</a>
+                    <a href="{{ url_for('schedule_page') }}" class="pill">{{ year }} Schedule</a>
                     <a href="{{ url_for('next_race') }}" class="pill">Next Race</a>
                     <a href="#" class="pill">About</a>
                 </div>

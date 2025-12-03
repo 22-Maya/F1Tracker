@@ -12,7 +12,7 @@
 
       <nav class="top-vertical-nav" aria-label="Main navigation">
           <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
-          <a href="{{ url_for('schedule') }}"><span class="icon">📅</span>Race Schedule</a>
+          <a href="{{ url_for('schedule_page') }}"><span class="icon">📅</span>Race Schedule</a>
           <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Track of the Week</a>
       </nav>
 
@@ -39,7 +39,7 @@
       <main class="main" role="main">
           <section class="card" style="max-width:720px;margin:24px auto;">
               <h1>Next Race ({{ year }})</h1>
-              <h2 style="margin-top:8px;">{{ event["EventName"] }}</h2>
+              <h2 style="margin-top:8px;">{{ event["EventName"] }}</h2> 
 
               <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ get_flag(event["Country"]) }} {{ event["Country"] }}</span></p>
               <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get("Location", "—") }}</span></p>
