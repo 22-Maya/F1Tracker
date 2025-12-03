@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>F1 Track Layout: {{ gp_name }}</title>
+
+      <link id="mainStylesheet" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+
+  <body>
+
+    <nav class="top-vertical-nav" aria-label="Main navigation">
+        <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
+        <a href="{{ url_for('schedule') }}"><span class="icon">📅</span>Race Schedule</a>
+        <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Track of the Week</a>
+    </nav>
+
+    <main class="main" role="main">
+        <section class="card" style="max-width:800px;margin:24px auto;text-align:center;">
+            <h1>Track Layout</h1>
+            <h2 style="margin-top:8px;">{{ title }}</h2>
+
+            {% if image_data %}
+                <figure style="margin:20px 0;">
+                    <img id="track-image" 
+                         src="data:image/png;base64,{{ image_data }}" 
+                         alt="{{ gp_name }} Circuit Layout"
+                         style="max-width:100%; height:auto; border-radius:var(--radius); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                    <figcaption style="margin-top:10px;color:var(--muted);font-size:0.9rem;">
+                        Circuit data generated using FastF1 from the {{ year }} {{ gp_name }} session.
+                    </figcaption>
+                </figure>
+            {% else %}
+                <p style="color:var(--accent);">Sorry, the track image could not be loaded. Please check the Python console for errors.</p>
+            {% endif %}
+
+            <div style="margin-top:20px;">
+                <a href="{{ url_for('next_race') }}" class="pill">Back to Next Race Details</a>
+            </div>
+        </section>
+    </main>
+
+  </body>
+</html>

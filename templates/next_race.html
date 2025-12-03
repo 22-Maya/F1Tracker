@@ -51,7 +51,7 @@
 
               <div style="margin-top:16px;">
                   <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
-                  <a href="#" class="pill" style="margin-left:8px;">Open Track</a>
+                  <a href="{{ url_for('track_layout', year=year, gp_name=event['FastF1Name']) }}" class="pill" style="margin-left:8px;">Open Track</a>
               </div>
           </section>
       </main>
