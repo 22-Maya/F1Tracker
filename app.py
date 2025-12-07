@@ -1,3 +1,4 @@
+# how to install: pip install flask fastf1 pandas matplotlib numpy, then run: .venv/bin/python app.py
 from flask import Flask, render_template, url_for, redirect, flash
 import fastf1
 import pandas as pd
@@ -71,7 +72,13 @@ def rotate(xy, *, angle):
 # app.py (Modified draw_f1_circuit loop)
 
 def draw_f1_circuit(year, gp_name, event_type='R', max_years_back=1):
+    """Generate a track layout visualization for a given F1 Grand Prix.
+    
+    Returns:
+        tuple: (base64_image_data, title_string, year_used)
+    """
     current_year = year
+    session_event = None
     
     for y in range(current_year, current_year - max_years_back - 1, -1):
         try:
@@ -80,47 +87,85 @@ def draw_f1_circuit(year, gp_name, event_type='R', max_years_back=1):
             session_event = fastf1.get_session(y, gp_name, event_type)
             session_event.load(laps=True, telemetry=True, weather=False, messages=False)
             
-            # 1. Check if the session actually loaded any laps
+            # Check if the session actually loaded any laps
             if session_event.laps.empty:
                 raise ValueError(f"Session data for {y} {gp_name} contains no laps.")
                 
             lap = session_event.laps.pick_fastest()
 
-            # 2. Check if the fastest lap has positional data
-            # Note: This check is often implicitly handled by fastf1, but good to be safe.
+            # Check if the fastest lap has positional data
             pos = lap.get_pos_data() 
             
             if pos.empty:
-                 raise ValueError(f"Fastest lap for {y} {gp_name} has no positional data.")
+                raise ValueError(f"Fastest lap for {y} {gp_name} has no positional data.")
 
             # Data loaded successfully!
             year = y
             break 
             
         except fastf1._api.SessionNotAvailableError:
-            # Existing fallback logic
             if y == current_year and max_years_back > 0:
                 logging.warning(f"Data for {y} {gp_name} not available. Falling back to previous year.")
                 continue
             else:
-                raise # Re-raise SessionNotAvailableError
+                raise
                 
-        # Catch the new ValueError and continue the loop if a fallback is available
         except ValueError as e:
             logging.warning(f"Data quality error for {y} {gp_name}: {e}")
             if y == current_year and max_years_back > 0:
                 continue
             else:
-                raise # Re-raise if no more fallbacks
+                raise
         
         except Exception as e:
             logging.error(f"Non-API error loading data for {y} {gp_name}: {e}")
             raise e
     else:
-        # Re-raise SessionNotAvailableError if loop completes (no data found)
         raise fastf1._api.SessionNotAvailableError(f"No data found for {gp_name} from {current_year} to {current_year - max_years_back}")
     
-    # ... continue with plotting ...
+    # --- Generate the track plot ---
+    try:
+        lap = session_event.laps.pick_fastest()
+        pos = lap.get_pos_data()
+        
+        # Create figure and axis
+        fig, ax = plt.subplots(figsize=(10, 8))
+        fig.patch.set_facecolor(BACKGROUND_COLOR)
+        ax.set_facecolor(BACKGROUND_COLOR)
+        
+        # Plot the track
+        ax.plot(pos['X'], pos['Y'], color=LINE_COLOR, linewidth=2, label='Track')
+        
+        # Mark corners (simplified: mark every 5th point as a corner)
+        corner_indices = np.arange(0, len(pos), max(1, len(pos) // 8))
+        for idx, i in enumerate(corner_indices):
+            x, y = pos['X'].iloc[i], pos['Y'].iloc[i]
+            ax.add_patch(plt.Circle((x, y), 50, color=CIRCLE_COLOR, fill=False, linewidth=2))
+            ax.text(x, y, str(idx + 1), color=TEXT_COLOR, fontsize=8, ha='center', va='center', weight='bold')
+        
+        ax.set_aspect('equal')
+        ax.set_title(f'{gp_name} Track Layout ({year})', color=TITLE_COLOR, fontsize=14, weight='bold')
+        ax.set_xlabel('X (meters)', color=TITLE_COLOR)
+        ax.set_ylabel('Y (meters)', color=TITLE_COLOR)
+        ax.tick_params(colors=TITLE_COLOR)
+        ax.spines['bottom'].set_color(TITLE_COLOR)
+        ax.spines['top'].set_color(TITLE_COLOR)
+        ax.spines['right'].set_color(TITLE_COLOR)
+        ax.spines['left'].set_color(TITLE_COLOR)
+        
+        # Convert to base64
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png', facecolor=BACKGROUND_COLOR, edgecolor='none', bbox_inches='tight')
+        plt.close(fig)
+        buf.seek(0)
+        image_data = base64.b64encode(buf.read()).decode('utf-8')
+        
+        title = f'{gp_name} ({year})'
+        return image_data, title, year
+        
+    except Exception as e:
+        logging.error(f"Error generating track plot for {gp_name}: {e}")
+        raise
 # --- Flask Routes ---
 
 @app.route("/")
