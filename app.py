@@ -1,4 +1,4 @@
-# how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy, then run: .venv/bin/python app.py
+# how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy && .venv/bin/python app.py
 from flask import Flask, render_template, url_for, redirect, flash
 import fastf1
 import pandas as pd
@@ -134,30 +134,28 @@ def draw_f1_circuit(year, gp_name, event_type='R', max_years_back=1):
         lap = session_event.laps.pick_fastest()
         pos = lap.get_pos_data()
         
-        # Create figure and axis
-        fig, ax = plt.subplots(figsize=(10, 8))
+        # Create figure and axis with wider aspect for horizontal layout
+        fig, ax = plt.subplots(figsize=(16, 9))
         fig.patch.set_facecolor(BACKGROUND_COLOR)
         ax.set_facecolor(BACKGROUND_COLOR)
         
         # Plot the track
-        ax.plot(pos['X'], pos['Y'], color=LINE_COLOR, linewidth=2, label='Track')
+        ax.plot(pos['X'], pos['Y'], color=LINE_COLOR, linewidth=3, label='Track')
         
-        # Mark corners (simplified: mark every 5th point as a corner)
+        # Mark corners (simplified: mark every nth point as a corner)
         corner_indices = np.arange(0, len(pos), max(1, len(pos) // 8))
         for idx, i in enumerate(corner_indices):
             x, y = pos['X'].iloc[i], pos['Y'].iloc[i]
             ax.add_patch(plt.Circle((x, y), 50, color=CIRCLE_COLOR, fill=False, linewidth=2))
-            ax.text(x, y, str(idx + 1), color=TEXT_COLOR, fontsize=8, ha='center', va='center', weight='bold')
+            ax.text(x, y, str(idx + 1), color=TEXT_COLOR, fontsize=10, ha='center', va='center', weight='bold')
         
         ax.set_aspect('equal')
-        ax.set_title(f'{gp_name} Track Layout ({year})', color=TITLE_COLOR, fontsize=14, weight='bold')
-        ax.set_xlabel('X (meters)', color=TITLE_COLOR)
-        ax.set_ylabel('Y (meters)', color=TITLE_COLOR)
-        ax.tick_params(colors=TITLE_COLOR)
-        ax.spines['bottom'].set_color(TITLE_COLOR)
-        ax.spines['top'].set_color(TITLE_COLOR)
-        ax.spines['right'].set_color(TITLE_COLOR)
-        ax.spines['left'].set_color(TITLE_COLOR)
+        
+        # Remove all axes, spines, ticks, and labels for a clean look
+        ax.axis('off')
+        
+        # Optional: Add title (can be removed if you prefer no text)
+        # ax.set_title(f'{gp_name} Track Layout ({year})', color=TITLE_COLOR, fontsize=14, weight='bold', pad=20)
         
         # Convert to base64
         buf = io.BytesIO()
