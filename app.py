@@ -1,9 +1,15 @@
-# how to install: pip install flask fastf1 pandas matplotlib numpy, then run: .venv/bin/python app.py
+# how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy, then run: .venv/bin/python app.py
 from flask import Flask, render_template, url_for, redirect, flash
 import fastf1
 import pandas as pd
 from fastf1 import plotting
 import numpy as np
+
+# CRITICAL: Set Matplotlib to non-interactive backend BEFORE importing pyplot
+# This prevents NSWindow threading errors on macOS when running in Flask threads
+import matplotlib
+matplotlib.use('Agg')
+
 from matplotlib import pyplot as plt
 import matplotlib as mpl
 import io
@@ -230,4 +236,5 @@ def track_layout(year, gp_name):
 if __name__ == "__main__":
     if not os.path.exists('cache'):
         os.makedirs('cache')
-    app.run(debug=True)
+    # Use port 5001 to avoid macOS ControlCenter/AirPlay on 5000
+    app.run(debug=True, port=5001)
