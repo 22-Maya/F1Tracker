@@ -37,23 +37,42 @@
       </div>
 
       <main class="main" role="main">
-          <section class="card" style="max-width:720px;margin:24px auto;">
-              <h1>Next Race ({{ year }})</h1>
-              <h2 style="margin-top:8px;">{{ event["EventName"] }}</h2> 
+        <section class="card" style="max-width:1000px;margin:24px auto;">
+            <div class="two-col" style="align-items:start; gap:20px;">
+                <div class="col-left" style="flex:1;">
+                    <h2 style="margin-top:0;">{{ event["EventName"] }}</h2>
 
-              <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ get_flag(event["Country"]) }} {{ event["Country"] }}</span></p>
-              <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get("Location", "—") }}</span></p>
+                    <p class="kv"><strong>Country:</strong>&nbsp;<span style="color:var(--muted)">{{ get_flag(event["Country"]) }} {{ event["Country"] }}</span></p>
+                    <p class="kv"><strong>Location:</strong>&nbsp;<span style="color:var(--muted)">{{ event.get("Location", "—") }}</span></p>
+                    <p class="kv"><strong>Date:</strong>&nbsp;<span class="race-date" data-utc="{{ event.get('date_utc', event['EventDate']) }}" style="color:var(--muted)"></span></p>
 
-              <p class="kv">
-                  <strong>Date:</strong>&nbsp;
-                  <span class="race-date" data-utc="{{ event.get('date_utc', event['EventDate']) }}" style="color:var(--muted)"></span>
-              </p>
+                    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                            <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
+                            <a href="{{ url_for('track_layout', year=year, gp_name=event['FastF1Name']) }}" class="pill">Open Track Page</a>
+                            <span id="track-spinner" class="spinner" style="display:none" aria-hidden="true"></span>
+                            <button id="regen-track" class="pill">Regenerate</button>
+                    </div>
 
-              <div style="margin-top:16px;">
-                  <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
-                  <a href="{{ url_for('track_layout', year=year, gp_name=event['FastF1Name']) }}" class="pill" style="margin-left:8px;">Open Track</a>
-              </div>
-          </section>
+                </div>
+
+                <div class="col-right" style="width:480px; max-width:48%; min-width:260px; text-align:center;">
+
+                    {% from '_macros.html' import track_img %}
+                    {% if data_available %}
+                            <figure style="margin:12px 0;">
+                                    {{ track_img(year, gp_name, cls='track-img') }}
+                            </figure>
+                    {% else %}
+                            <p style="color:var(--accent);">Sorry, the track image could not be loaded. Please check the Python console for errors.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Orientation: strict-only enforced server-side -->
+        </section>
+          <!-- <section class="card" style="max-width:720px;margin:24px auto;">
+              <h2>About the Track</h2>
+              <p>{{ track_info }}</p>
+          </section> -->
       </main>
 
       <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
@@ -85,6 +104,109 @@
 
           // Run on page load
           convertAllTimes();
+
+          // Rotation is strict-only server-side; no client-side rotation controls
+
+          // Regenerate track image (cache-bust)
+          const regenBtn = document.getElementById('regen-track');
+          if (regenBtn) {
+              regenBtn.addEventListener('click', function() {
+                  const img = document.querySelector('.track-img');
+                  const spinner = document.getElementById('track-spinner');
+                  if (!img) return;
+                  const base = "{{ url_for('track_image', year=year, gp_name=gp_name) }}";
+
+                  // Disable button and show spinner
+                  regenBtn.disabled = true;
+                  regenBtn.setAttribute('aria-busy', 'true');
+                  if (spinner) spinner.style.display = 'inline-block';
+                  img.classList.add('loading');
+
+                  // Set up handlers to re-enable UI once image loads or fails
+                  img.onload = function() {
+                      if (spinner) spinner.style.display = 'none';
+                      regenBtn.disabled = false;
+                      regenBtn.removeAttribute('aria-busy');
+                      img.classList.remove('loading');
+                      img.onload = null;
+                      img.onerror = null;
+                  };
+
+                  img.onerror = function() {
+                      if (spinner) spinner.style.display = 'none';
+                      regenBtn.disabled = false;
+                      regenBtn.removeAttribute('aria-busy');
+                      img.classList.remove('loading');
+                      img.onerror = null;
+                      alert('Failed to regenerate track image. Check server logs.');
+                  };
+
+                  // Strict-only rotation: just refresh image (server enforces rotation)
+                  img.src = base + '?refresh=1&ts=' + Date.now();
+              });
+          }
+
+          // Scale slider functionality (client-side scaling)
+          const scaleRange = document.getElementById('scaleRange');
+          const scaleValue = document.getElementById('scale-value');
+          const imgEl = document.querySelector('.track-img');
+          if (scaleRange && imgEl) {
+              // Initialize from localStorage if available
+              const stored = localStorage.getItem('track_scale_pct');
+              if (stored) {
+                  scaleRange.value = stored;
+                  scaleValue.textContent = stored + '%';
+                  imgEl.style.width = stored + '%';
+              }
+
+              scaleRange.addEventListener('input', function(e) {
+                  const v = e.target.value;
+                  scaleValue.textContent = v + '%';
+                  imgEl.style.width = v + '%';
+              });
+
+              scaleRange.addEventListener('change', function(e) {
+                  const v = e.target.value;
+                  localStorage.setItem('track_scale_pct', v);
+              });
+          }
+
+          // High-res fetch buttons
+          const hrButtons = document.querySelectorAll('.hr');
+          if (hrButtons && hrButtons.length) {
+              hrButtons.forEach(btn => {
+                  btn.addEventListener('click', function() {
+                      const w = btn.getAttribute('data-w');
+                      const h = btn.getAttribute('data-h');
+                      const base = "{{ url_for('track_image', year=year, gp_name=gp_name) }}";
+                      const spinner = document.getElementById('track-spinner');
+
+                      // show loading UI
+                      btn.disabled = true;
+                      if (spinner) spinner.style.display = 'inline-block';
+                      imgEl.classList.add('loading');
+
+                      // set load handlers to restore UI
+                      imgEl.onload = function() {
+                          if (spinner) spinner.style.display = 'none';
+                          btn.disabled = false;
+                          imgEl.classList.remove('loading');
+                          imgEl.onload = null;
+                      };
+
+                      imgEl.onerror = function() {
+                          if (spinner) spinner.style.display = 'none';
+                          btn.disabled = false;
+                          imgEl.classList.remove('loading');
+                          imgEl.onerror = null;
+                          alert('Failed to fetch high-res image. Check server logs.');
+                      };
+
+                      // Strict-only rotation: just fetch high-res image (server enforces rotation)
+                      imgEl.src = base + `?w=${w}&h=${h}&refresh=1&ts=${Date.now()}`;
+                  });
+              });
+          }
       </script>
 
   </body>

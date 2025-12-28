@@ -10,6 +10,57 @@
   --glass-blur: 6px;
 }
 
+/* Spinner for loading track regeneration */
+.spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.track-img.loading {
+  opacity: 0.4;
+  filter: blur(0.5px) grayscale(0.05);
+  transition: opacity 200ms ease;
+}
+
+.track-img { width: 100%; height: auto; display: inline-block; }
+
+/* Two-column layout for Next Race card */
+.two-col {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.two-col .col-left {
+  flex: 1 1 320px;
+}
+
+.two-col .col-right {
+  flex: 0 0 480px;
+}
+
+@media (max-width: 880px) {
+  .two-col {
+    flex-direction: column;
+  }
+  .two-col .col-right {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
 /* Page background */
 html,body{
   height:100%;

@@ -1,0 +1,14 @@
+{% macro track_img(year, gp, angle=None, show_axes=0, w=None, h=None, cls='') %}
+  {# Build arguments dict to pass as query params #}
+  {% set params = {} %}
+  {% if angle is not none %}
+    {% set _ = params.update({'angle': angle}) %}
+  {% endif %}
+  {% if show_axes %}
+    {% set _ = params.update({'show_axes': 1}) %}
+  {% endif %}
+  {% if w and h %}
+    {% set _ = params.update({'w': w, 'h': h}) %}
+  {% endif %}
+  <img src="{{ url_for('track_image', year=year, gp_name=gp, **params) }}" class="{{ cls }}" alt="{{ gp }} Circuit Layout" style="max-width:100%; height:auto; border-radius:var(--radius); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+{% endmacro %}
