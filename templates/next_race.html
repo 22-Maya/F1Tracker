@@ -13,7 +13,7 @@
       <nav class="top-vertical-nav" aria-label="Main navigation">
           <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
           <a href="{{ url_for('schedule_page') }}"><span class="icon">📅</span>Race Schedule</a>
-          <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Track of the Week</a>
+          <a href="{{ url_for('next_race') }}" class="active"><span class="icon">🗺️</span>Next Track</a>
       </nav>
 
       <div id="timezoneSelector" class="tz-wrapper">
@@ -48,9 +48,8 @@
 
                     <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
                             <a href="{{ url_for('index') }}" class="pill">Back to Calendar</a>
-                            <a href="{{ url_for('track_layout', year=year, gp_name=event['FastF1Name']) }}" class="pill">Open Track Page</a>
-                            <span id="track-spinner" class="spinner" style="display:none" aria-hidden="true"></span>
                             <button id="regen-track" class="pill">Regenerate</button>
+                            <span id="track-spinner" class="spinner" style="display:none" aria-hidden="true"></span>
                     </div>
 
                 </div>
@@ -111,15 +110,45 @@
           const regenBtn = document.getElementById('regen-track');
           if (regenBtn) {
               regenBtn.addEventListener('click', function() {
-                  const img = document.querySelector('.track-img');
+                  let img = document.querySelector('.track-img');
                   const spinner = document.getElementById('track-spinner');
-                  if (!img) return;
                   const base = "{{ url_for('track_image', year=year, gp_name=gp_name) }}";
 
                   // Disable button and show spinner
                   regenBtn.disabled = true;
                   regenBtn.setAttribute('aria-busy', 'true');
                   if (spinner) spinner.style.display = 'inline-block';
+                  
+                  // If image doesn't exist yet (initial load failed), create it
+                  if (!img) {
+                      const figureContainer = document.querySelector('.col-right');
+                      if (figureContainer) {
+                          // Remove error message if present
+                          const errorMsg = figureContainer.querySelector('p');
+                          if (errorMsg) {
+                              errorMsg.remove();
+                          }
+                          // Create figure with image
+                          const figure = document.createElement('figure');
+                          figure.style.margin = '12px 0';
+                          img = document.createElement('img');
+                          img.className = 'track-img';
+                          img.style.maxWidth = '100%';
+                          img.style.height = 'auto';
+                          img.style.borderRadius = 'var(--radius)';
+                          img.style.boxShadow = '0 8px 24px rgba(0,0,0,0.5)';
+                          figure.appendChild(img);
+                          figureContainer.appendChild(figure);
+                      }
+                  }
+                  
+                  if (!img) {
+                      regenBtn.disabled = false;
+                      regenBtn.removeAttribute('aria-busy');
+                      if (spinner) spinner.style.display = 'none';
+                      return;
+                  }
+                  
                   img.classList.add('loading');
 
                   // Set up handlers to re-enable UI once image loads or fails

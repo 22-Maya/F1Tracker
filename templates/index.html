@@ -10,10 +10,16 @@
 
   <body>
 
-    <nav class="top-vertical-nav" aria-label="Main navigation">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <nav class="top-vertical-nav" id="mobile-nav" aria-label="Main navigation">
         <a href="{{ url_for('index') }}" class="active"><span class="icon">🏁</span>Home</a>
         <a href="{{ url_for('schedule_page') }}"><span class="icon">📅</span>Race Schedule</a>
-        <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
+        <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Next Track</a>
     </nav>
 
     <div id="timezoneSelector" class="tz-wrapper">
@@ -39,7 +45,7 @@
     <main class="main" role="main">
         <header class="card" style="margin-bottom:18px;">
             <h1>F1 Calendar {{ year }}</h1>
-            <p class="lead">Season schedule — click a race to view details or open the Track of the Week.</p>
+            <p class="lead">Season schedule — click a race to view details or open the Next Track.</p>
         </header>
 
         <section class="content-grid">
@@ -54,7 +60,7 @@
 
             <div class="card">
                 <h2>Quick Actions</h2>
-                <p class="lead">Open the next race or view the current Track of the Week.</p>
+                <p class="lead">Open the current race schedule or view the next track.</p>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
                     <a href="{{ url_for('schedule_page') }}" class="pill">{{ year }} Schedule</a>
                     <a href="{{ url_for('next_race') }}" class="pill">Next Race</a>
@@ -63,5 +69,24 @@
             </div>
         </section>
     </main>
+
+    <script>
+        const navToggle = document.getElementById('nav-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        const navLinks = mobileNav.querySelectorAll('a');
+
+        navToggle.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            mobileNav.classList.toggle('active');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navToggle.setAttribute('aria-expanded', 'false');
+                mobileNav.classList.remove('active');
+            });
+        });
+    </script>
   </body>
 </html>

@@ -14,7 +14,7 @@
         <nav class="top-vertical-nav" aria-label="Main navigation">
             <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
             <a href="{{ url_for('schedule_page') }}" class="active"><span class="icon">📅</span>Race Schedule</a>
-            <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Track of the Week</a>
+            <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Next Track</a>
         </nav>
 
         <div id="timezoneSelector" class="tz-wrapper">
@@ -40,7 +40,7 @@
         <main class="main" role="main">
             <header class="card" style="margin-bottom:18px;">
                 <h1>F1 Calendar {{ year }}</h1>
-                <p class="lead">Season schedule — click a race to view details or open the Track of the Week.</p>
+                <p class="lead">Season schedule — click a race to view details or open the Next Track.</p>
             </header>
 
             <section class="content-grid">
