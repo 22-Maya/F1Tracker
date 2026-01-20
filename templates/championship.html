@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Championship Standings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav class="top-vertical-nav">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
+    <a href="{{ url_for('championship') }}" class="active"><span class="icon">🏆</span>Championship</a>
+    <a href="{{ url_for('schedule_page') }}"><span class="icon">📅</span>Race Schedule</a>
+    <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Next Track</a>
+</nav>
+
+<main class="main">
+    <section class="card" style="max-width:800px;margin:24px auto;">
+        <h1>Championship Standings</h1>
+        
+        <!-- Year Selector -->
+        {% if available_years %}
+        <div style="margin-top:16px;">
+            <label style="color: var(--muted); font-size: 0.9rem;">View standings for:</label>
+            <select id="yearSelect" style="margin-top: 8px; padding: 8px 12px; border: 1px solid var(--muted); border-radius: 4px; background: rgba(0,0,0,0.3); color: white;">
+                {% if show_grid %}
+                <option value="{{ current_year }}" selected>{{ current_year }} (Grid List)</option>
+                {% endif %}
+                {% for year in available_years %}
+                <option value="{{ year }}" {% if year == selected_year and not show_grid %}selected{% endif %}>{{ year }} Standings</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+        {% if show_grid %}
+        <p style="color: var(--accent); margin: 12px 0; font-size: 0.9rem;">
+            🔔 {{ current_year }} season data not available yet. Showing alphabetical team grid.
+        </p>
+        {% elif data_year and data_year != selected_year %}
+        <p style="color: var(--accent); margin: 12px 0; font-size: 0.9rem;">
+            🔔 No standings found for {{ selected_year }}. Showing {{ data_year }} standings.
+        </p>
+        {% endif %}
+
+        <!-- Tabs to swap between drivers and constructors -->
+        <div style="margin-top:16px; display:flex; gap:12px;">
+            <button id="driversBtn" class="pill">Drivers</button>
+            <button id="constructorsBtn" class="pill">Constructors</button>
+        </div>
+
+        <!-- driver standings -->
+        <div id="drivers" style="margin-top:24px;">
+            {% if show_grid %}
+            <h2>F1 Drivers (Alphabetical)</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for d in drivers %}
+                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ d.team_color }}; background: rgba(255,255,255,0.02);">
+                    <strong>#{{ d.number }} {{ d.name }}</strong><br>
+                    <span style="color: var(--muted);">{{ d.team }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <h2>Drivers Championship {{ selected_year if data_year == selected_year else data_year }}</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for d in drivers %}
+                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ d.team_color }}; background: rgba(255,255,255,0.02);">
+                    <strong>{{ loop.index }}. {{ d.name }}</strong><br>
+                    <span style="color: var(--muted);">{{ d.team }} — {{ d.points }} pts</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <!-- constructor standings -->
+        <div id="constructors" style="margin-top:24px; display:none;">
+            {% if show_grid %}
+            <h2>F1 Teams (Alphabetical)</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for c in constructors %}
+                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ c.team_color }}; background: rgba(255,255,255,0.02);">
+                    <strong>{{ c.team }}</strong>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <h2>Constructors Championship {{ selected_year if data_year == selected_year else data_year }}</h2>
+            <ul style="list-style: none; padding: 0;">
+                {% for c in constructors %}
+                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ c.team_color }}; background: rgba(255,255,255,0.02);">
+                    <strong>{{ loop.index }}. {{ c.team }}</strong><br>
+                    <span style="color: var(--muted);">{{ c.points }} pts</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+<script>
+    // Hamburger menu toggle
+    const navToggle = document.getElementById("nav-toggle");
+    const nav = document.querySelector(".top-vertical-nav");
+    
+    if (navToggle) {
+        navToggle.addEventListener("click", () => {
+            nav.classList.toggle("open");
+            navToggle.setAttribute("aria-expanded", nav.classList.contains("open"));
+        });
+    }
+
+    const driversBtn = document.getElementById("driversBtn");
+    const constructorsBtn = document.getElementById("constructorsBtn");
+    const yearSelect = document.getElementById("yearSelect");
+
+    const drivers = document.getElementById("drivers");
+    const constructors = document.getElementById("constructors");
+
+    driversBtn.onclick = () => {
+        drivers.style.display = "block";
+        constructors.style.display = "none";
+    }
+
+    constructorsBtn.onclick = () => {
+        drivers.style.display = "none";
+        constructors.style.display = "block";
+    }
+    
+    // Handle year selection change
+    if (yearSelect) {
+        yearSelect.onchange = () => {
+            const selectedYear = yearSelect.value;
+            window.location.href = `?year=${selectedYear}`;
+        }
+    }
+</script>
+
+</body>
+</html>

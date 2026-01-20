@@ -11,8 +11,14 @@
 
     <body>
 
-        <nav class="top-vertical-nav" aria-label="Main navigation">
+        <nav class="top-vertical-nav">
+            <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <a href="{{ url_for('index') }}"><span class="icon">🏁</span>Home</a>
+            <a href="{{ url_for('championship') }}"><span class="icon">🏆</span>Championship</a>
             <a href="{{ url_for('schedule_page') }}" class="active"><span class="icon">📅</span>Race Schedule</a>
             <a href="{{ url_for('next_race') }}"><span class="icon">🗺️</span>Next Track</a>
         </nav>
@@ -91,7 +97,6 @@
             cells.forEach(cell => {
                 const utcTime = cell.getAttribute("data-utc");
                 const date = new Date(utcTime);
-
                 const options = {
                     year: "numeric",
                     month: "short",
@@ -107,6 +112,17 @@
         }
 
         document.getElementById("timezoneSelect").addEventListener("change", convertAllTimes);
+        
+        // Hamburger menu toggle
+        const navToggle = document.getElementById("nav-toggle");
+        const nav = document.querySelector(".top-vertical-nav");
+        
+        if (navToggle) {
+            navToggle.addEventListener("click", () => {
+                nav.classList.toggle("open");
+                navToggle.setAttribute("aria-expanded", nav.classList.contains("open"));
+            });
+        }
 
         // Run on page load
         convertAllTimes();

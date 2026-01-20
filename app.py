@@ -1,7 +1,8 @@
-# how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy && .venv/bin/python app.py
+# how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy requests && .venv/bin/python app.py
 from flask import Flask, render_template, url_for, redirect, flash, Response, request, abort
 import hashlib
 import fastf1
+import requests
 import pandas as pd
 from fastf1 import plotting
 import numpy as np
@@ -32,6 +33,45 @@ TEXT_COLOR = '#000000'       # Black text for corner number (for contrast on whi
 TITLE_COLOR = '#FFFFFF'      # White title text
 
 app = Flask(__name__)
+
+# Team Data for 2026 F1 Season (current drivers)
+TEAM_DATA = {
+    "Mercedes": {"color": "#00D2BE", "logo": "mercedes.png"},
+    "Red Bull": {"color": "#1E41FF", "logo": "redbull.png"},
+    "Ferrari": {"color": "#DC0000", "logo": "ferrari.png"},
+    "McLaren": {"color": "#FF8700", "logo": "mclaren.png"},
+    "Alpine": {"color": "#2293D1", "logo": "alpine.png"},
+    "Aston Martin": {"color": "#006F62", "logo": "aston.png"},
+    "Williams": {"color": "#0066FF", "logo": "williams.png"},
+    "Audi": {"color": "#00D4BE", "logo": "audi.png"},
+    "Racing Bulls": {"color": "#3671C6", "logo": "racing_bulls.png"},
+    "Cadillac": {"color": "#FF00FF", "logo": "cadillac.png"},
+    "Haas": {"color": "#B6BABD", "logo": "haas.png"},
+}
+
+# Driver Data for 2026 F1 Season (current drivers)
+DRIVERS_DATA = [
+    {"name": "Charles Leclerc", "number": "16", "team": "Ferrari"},
+    {"name": "Lewis Hamilton", "number": "44", "team": "Ferrari"},
+    {"name": "Lando Norris", "number": "4", "team": "McLaren"},
+    {"name": "Oscar Piastri", "number": "81", "team": "McLaren"},
+    {"name": "Max Verstappen", "number": "1", "team": "Red Bull"},
+    {"name": "Sergio Perez", "number": "11", "team": "Red Bull"},
+    {"name": "George Russell", "number": "63", "team": "Mercedes"},
+    {"name": "Andrea Kimi Antonelli", "number": "12", "team": "Mercedes"},
+    {"name": "Yuki Tsunoda", "number": "22", "team": "Racing Bulls"},
+    {"name": "Isack Hadjar", "number": "7", "team": "Racing Bulls"},
+    {"name": "Fernando Alonso", "number": "14", "team": "Aston Martin"},
+    {"name": "Lance Stroll", "number": "18", "team": "Aston Martin"},
+    {"name": "Nico Hulkenberg", "number": "27", "team": "Haas"},
+    {"name": "Gabriel Bortoleto", "number": "5", "team": "Haas"},
+    {"name": "Alex Albon", "number": "23", "team": "Williams"},
+    {"name": "Carlos Sainz", "number": "55", "team": "Williams"},
+    {"name": "Esteban Ocon", "number": "31", "team": "Alpine"},
+    {"name": "Jack Doohan", "number": "38", "team": "Alpine"},
+    {"name": "Oliver Bearman", "number": "50", "team": "Cadillac"},
+    {"name": "Juri Vips", "number": "6", "team": "Cadillac"},
+]
 
 # Mapping of country names to ISO 3166-1 alpha-2 codes for flag emojis
 COUNTRY_TO_FLAG = {
@@ -192,12 +232,18 @@ def draw_f1_circuit(year, gp_name, event_type='R', max_years_back=1, *, angle_ra
         logging.error(f"Error generating track plot for {gp_name}: {e}")
         raise
 
+# --- OPENF1 API ---
+def get_openf1_json(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
 # --- Flask Routes ---
 
 @app.route("/")
 def index():
     schedule, year = load_calendar()
-    return render_template("index.html", schedule=schedule.to_dict(orient="records"), year=year, get_flag=get_flag)
+    return render_template("index.html", schedule=schedule.to_dict(orient="records"), year=year, current_year=year, get_flag=get_flag)
 
 @app.route("/schedule")
 def schedule_page():
@@ -417,6 +463,137 @@ def track_image(year, gp_name):
     except Exception as e:
         logging.error(f"Error generating track image: {e}")
         return abort(500, "Error generating image")
+
+@app.route("/championship")
+def championship():
+    current_year = pd.Timestamp.today().year
+    selected_year = request.args.get('year', current_year, type=int)
+    
+    # Try to fetch standings for the selected year
+    drivers = []
+    constructors = []
+    data_year = None
+    show_grid = False
+    available_years = []
+    
+    # Check what years have standings available (for the selector)
+    for check_year in range(2025, 2015, -1):
+        try:
+            drv_url = f"https://ergast.com/api/f1/{check_year}/driverStandings.json"
+            drv_data = get_openf1_json(drv_url)
+            if drv_data['MRData']['StandingsTable']['StandingsLists']:
+                available_years.append(check_year)
+        except Exception:
+            pass
+    
+    # Try to fetch standings for the selected year
+    try:
+        # Drivers
+        drv_url = f"https://ergast.com/api/f1/{selected_year}/driverStandings.json"
+        drv_data = get_openf1_json(drv_url)
+        drivers_raw = drv_data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
+
+        drivers = [
+            {
+                "name": f"{d['Driver']['givenName']} {d['Driver']['familyName']}",
+                "team": d['Constructors'][0]['name'],
+                "team_color": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('color', '#9aa6b2'),
+                "points": d['points']
+            }
+            for d in drivers_raw
+        ]
+
+        # Constructors
+        cons_url = f"https://ergast.com/api/f1/{selected_year}/constructorStandings.json"
+        cons_data = get_openf1_json(cons_url)
+        constructors_raw = cons_data['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
+
+        constructors = [
+            {
+                "team": c['Constructor']['name'],
+                "team_color": TEAM_DATA.get(c['Constructor']['name'], {}).get('color', '#9aa6b2'),
+                "points": c['points']
+            }
+            for c in constructors_raw
+        ]
+        
+        data_year = selected_year
+        logging.info(f"Successfully fetched standings for {selected_year}")
+        
+    except Exception as e:
+        logging.warning(f"Could not fetch standings for {selected_year}: {e}")
+        
+        # If requested year is current year and has no data, show grid list
+        if selected_year == current_year:
+            show_grid = True
+            # Create driver list with team colors
+            drivers = sorted([
+                {
+                    "name": d['name'],
+                    "number": d['number'],
+                    "team": d['team'],
+                    "team_color": TEAM_DATA.get(d['team'], {}).get('color', '#9aa6b2')
+                }
+                for d in DRIVERS_DATA
+            ], key=lambda x: x['name'])
+            
+            constructors = sorted([
+                {
+                    "team": team,
+                    "team_color": TEAM_DATA.get(team, {}).get('color', '#9aa6b2')
+                }
+                for team in TEAM_DATA.keys()
+            ], key=lambda x: x['team'])
+            
+            data_year = None
+        else:
+            # If a previous year was selected and has no data, try falling back
+            for try_year in range(selected_year - 1, selected_year - 5, -1):
+                try:
+                    drv_url = f"https://ergast.com/api/f1/{try_year}/driverStandings.json"
+                    drv_data = get_openf1_json(drv_url)
+                    drivers_raw = drv_data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
+
+                    drivers = [
+                        {
+                            "name": f"{d['Driver']['givenName']} {d['Driver']['familyName']}",
+                            "team": d['Constructors'][0]['name'],
+                            "team_color": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('color', '#9aa6b2'),
+                            "points": d['points']
+                        }
+                        for d in drivers_raw
+                    ]
+
+                    cons_url = f"https://ergast.com/api/f1/{try_year}/constructorStandings.json"
+                    cons_data = get_openf1_json(cons_url)
+                    constructors_raw = cons_data['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
+
+                    constructors = [
+                        {
+                            "team": c['Constructor']['name'],
+                            "team_color": TEAM_DATA.get(c['Constructor']['name'], {}).get('color', '#9aa6b2'),
+                            "points": c['points']
+                        }
+                        for c in constructors_raw
+                    ]
+                    
+                    data_year = try_year
+                    logging.info(f"Successfully fetched standings for fallback year {try_year}")
+                    break
+                except Exception as inner_e:
+                    logging.warning(f"Could not fetch standings for {try_year}: {inner_e}")
+                    continue
+
+    return render_template(
+        "championship.html",
+        drivers=drivers,
+        constructors=constructors,
+        current_year=current_year,
+        selected_year=selected_year,
+        data_year=data_year,
+        show_grid=show_grid,
+        available_years=available_years
+    )
 
 if __name__ == "__main__":
     if not os.path.exists('cache'):
