@@ -1,0 +1,25 @@
+<nav class="top-vertical-nav">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}><span class="icon">🏁</span>Home</a>
+    <a href="{{ url_for('championship') }}" {% if request.endpoint == 'championship' %}class="active"{% endif %}><span class="icon">🏆</span>Championship</a>
+    <a href="{{ url_for('schedule_page') }}" {% if request.endpoint == 'schedule_page' %}class="active"{% endif %}><span class="icon">📅</span>Race Schedule</a>
+    <a href="{{ url_for('next_race') }}" {% if request.endpoint == 'next_race' %}class="active"{% endif %}><span class="icon">🗺️</span>Next Track</a>
+</nav>
+
+<script>
+    // Hamburger menu toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const topNav = document.querySelector('.top-vertical-nav');
+
+    if (navToggle) {
+        navToggle.addEventListener('click', function() {
+            topNav.classList.toggle('active');
+            navToggle.setAttribute('aria-expanded', topNav.classList.contains('active'));
+        });
+    }
+</script>
