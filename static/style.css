@@ -1,7 +1,5 @@
 /* Theme vars */
 :root{
-  --bg-1: #0f1724;
-  --bg-2: #071022;
   --card: rgba(255,255,255,0.04);
   --accent: #ff4655;
   --muted: #9aa6b2;
@@ -66,7 +64,7 @@ html,body{
   height:100%;
   margin:0;
   font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  background-color: #0f1724;
   color:#9ecfff;
   -webkit-font-smoothing:antialiased;
 }
