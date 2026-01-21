@@ -51,22 +51,35 @@
             {% if show_grid %}
             <h2>F1 Drivers (Alphabetical)</h2>
             <ul style="list-style: none; padding: 0;">
+                
                 {% for d in drivers %}
-                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ d.team_color }}; background: rgba(255,255,255,0.02);">
-                    <strong>#{{ d.number }} {{ d.name }}</strong><br>
-                    <span style="color: var(--muted);">{{ d.team }}</span>
+                <li style="padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.02); display: flex; align-items: center;">
+                    <div style="width: 60px; height: 60px; background: {{ d.team_color }}; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border-radius: 4px;">
+                        {% if d.logo %}
+                        <img src="{{ url_for('static', filename=d.logo) }}" alt="logo" style="max-height: 48px; max-width: 48px; object-fit: contain;">
+                        {% else %}
+                        <span style="color: rgba(255,255,255,0.7); font-weight: bold; font-size: 0.9rem;">{{ d.team[:2].upper() }}</span>
+                        {% endif %}
+                    </div>
+                    <div style="margin-left: 12px;">
+                        <strong>{{ loop.index }}. {{ d.name }}</strong><br>
+                        <span style="color: var(--muted);">{{ d.points }} pts</span>
+                    </div>
                 </li>
                 {% endfor %}
+
             </ul>
             {% else %}
             <h2>Drivers Championship {{ selected_year if data_year == selected_year else data_year }}</h2>
             <ul style="list-style: none; padding: 0;">
+                
                 {% for d in drivers %}
                 <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ d.team_color }}; background: rgba(255,255,255,0.02);">
                     <strong>{{ loop.index }}. {{ d.name }}</strong><br>
                     <span style="color: var(--muted);">{{ d.team }} — {{ d.points }} pts</span>
                 </li>
                 {% endfor %}
+
             </ul>
             {% endif %}
         </div>
@@ -76,11 +89,23 @@
             {% if show_grid %}
             <h2>F1 Teams (Alphabetical)</h2>
             <ul style="list-style: none; padding: 0;">
+                
                 {% for c in constructors %}
-                <li style="padding: 12px; margin: 8px 0; border-left: 4px solid {{ c.team_color }}; background: rgba(255,255,255,0.02);">
-                    <strong>{{ c.team }}</strong>
+                <li style="padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.02); display: flex; align-items: center;">
+                    <div style="width: 60px; height: 60px; background: {{ c.team_color }}; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border-radius: 4px;">
+                        {% if c.logo %}
+                        <img src="{{ url_for('static', filename=c.logo) }}" alt="logo" style="max-height: 48px; max-width: 48px; object-fit: contain;">
+                        {% else %}
+                        <span style="color: rgba(255,255,255,0.7); font-weight: bold; font-size: 0.9rem;">{{ c.team[:2].upper() }}</span>
+                        {% endif %}
+                    </div>
+                    <div style="margin-left: 12px;">
+                        <strong>{{ loop.index }}. {{ c.team }}</strong><br>
+                        <span style="color: var(--muted);">{{ c.points }} pts</span>
+                    </div>
                 </li>
                 {% endfor %}
+
             </ul>
             {% else %}
             <h2>Constructors Championship {{ selected_year if data_year == selected_year else data_year }}</h2>

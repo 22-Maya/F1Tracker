@@ -36,17 +36,17 @@ app = Flask(__name__)
 
 # Team Data for 2026 F1 Season (current drivers)
 TEAM_DATA = {
-    "Mercedes": {"color": "#00A19B", "logo": "mercedes.png"},
-    "Red Bull": {"color": "#4781D7", "logo": "redbull.png"},
-    "Ferrari": {"color": "#EF1A2D", "logo": "ferrari.png"},
-    "McLaren": {"color": "#FF5800", "logo": "mclaren.png"},
-    "Alpine": {"color": "#0075E0", "logo": "alpine.png"},
-    "Aston Martin": {"color": "#002420", "logo": "aston.png"},
-    "Williams": {"color": "#0033CC", "logo": "williams.png"},
-    "Audi": {"color": "#00D4BE", "logo": "audi.png"},
-    "Racing Bulls": {"color": "#6C98FF", "logo": "racing_bulls.png"},
-    "Cadillac": {"color": "#FF00FF", "logo": "cadillac.png"},
-    "Haas": {"color": "#B6BABD", "logo": "haas.png"},
+    "Mercedes": {"color": "#00A19B", "logo": "assets/mercedes.png"},
+    "Red Bull": {"color": "#4781D7", "logo": "assets/redbull.png"},
+    "Ferrari": {"color": "#EF1A2D", "logo": "assets/ferrari.png"},
+    "McLaren": {"color": "#FF5800", "logo": "assets/mclaren.png"},
+    "Alpine": {"color": "#0075E0", "logo": "assets/alpine.png"},
+    "Aston Martin": {"color": "#002420", "logo": "assets/aston.png"},
+    "Williams": {"color": "#0033CC", "logo": "assets/williams.png"},
+    "Audi": {"color": "#00D4BE", "logo": "assets/audi.png"},
+    "Racing Bulls": {"color": "#6C98FF", "logo": "assets/racing_bulls.png"},
+    "Cadillac": {"color": "#FF00FF", "logo": "assets/cadillac.png"},
+    "Haas": {"color": "#B6BABD", "logo": "assets/haas.png"},
 }
 
 # Driver Data for 2026 F1 Season (current drivers)
@@ -204,12 +204,12 @@ def draw_f1_circuit(year, gp_name, event_type='R', max_years_back=1, *, angle_ra
         fig.patch.set_facecolor(BACKGROUND_COLOR)
         ax.set_facecolor(BACKGROUND_COLOR)
 
-        ax.plot(pos['X_rot'], pos['Y_rot'], color=LINE_COLOR, linewidth=3)
+        ax.plot(pos['X_rot'], pos['Y_rot'], color=LINE_COLOR, linewidth=6)
 
         corner_indices = np.arange(0, len(pos), max(1, len(pos) // 8))
         for idx, i in enumerate(corner_indices):
             x, y = pos['X_rot'].iloc[i], pos['Y_rot'].iloc[i]
-            ax.add_patch(plt.Circle((x, y), 50, color=CIRCLE_COLOR, fill=False, linewidth=2))
+            ax.add_patch(plt.Circle((x, y), 50, color=CIRCLE_COLOR, fill=False, linewidth=6))
             ax.text(x, y, str(idx + 1), color=TEXT_COLOR, fontsize=10, ha='center', va='center', weight='bold')
 
         ax.set_aspect('equal')
@@ -370,7 +370,7 @@ def race_view(year, gp_name):
 
 @app.route("/track_image/<int:year>/<string:gp_name>")
 def track_image(year, gp_name):
-    """Return the PNG bytes for a track image. Supports optional query params:
+    """Return the png bytes for a track image. Supports optional query params:
        - angle: rotation in degrees (positive CCW)
        - show_axes: 1 to show axes, 0 (default) to hide
        - w, h: figsize width and height in inches (floats)
@@ -500,6 +500,7 @@ def championship():
                 "name": f"{d['Driver']['givenName']} {d['Driver']['familyName']}",
                 "team": d['Constructors'][0]['name'],
                 "team_color": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('color', '#9aa6b2'),
+                "logo": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('logo', ''),
                 "points": d['points']
             }
             for d in drivers_raw
@@ -514,6 +515,7 @@ def championship():
             {
                 "team": c['Constructor']['name'],
                 "team_color": TEAM_DATA.get(c['Constructor']['name'], {}).get('color', '#9aa6b2'),
+                "logo": TEAM_DATA.get(c['Constructor']['name'], {}).get('logo', ''),
                 "points": c['points']
             }
             for c in constructors_raw
@@ -534,7 +536,8 @@ def championship():
                     "name": d['name'],
                     "number": d['number'],
                     "team": d['team'],
-                    "team_color": TEAM_DATA.get(d['team'], {}).get('color', '#9aa6b2')
+                    "team_color": TEAM_DATA.get(d['team'], {}).get('color', '#9aa6b2'),
+                    "logo": TEAM_DATA.get(d['team'], {}).get('logo', '')
                 }
                 for d in DRIVERS_DATA
             ], key=lambda x: x['name'])
@@ -542,7 +545,8 @@ def championship():
             constructors = sorted([
                 {
                     "team": team,
-                    "team_color": TEAM_DATA.get(team, {}).get('color', '#9aa6b2')
+                    "team_color": TEAM_DATA.get(team, {}).get('color', '#9aa6b2'),
+                    "logo": TEAM_DATA.get(team, {}).get('logo', '')
                 }
                 for team in TEAM_DATA.keys()
             ], key=lambda x: x['team'])
@@ -574,6 +578,7 @@ def championship():
                         {
                             "team": c['Constructor']['name'],
                             "team_color": TEAM_DATA.get(c['Constructor']['name'], {}).get('color', '#9aa6b2'),
+                            "logo": TEAM_DATA.get(c['Constructor']['name'], {}).get('logo', ''),
                             "points": c['points']
                         }
                         for c in constructors_raw
