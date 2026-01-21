@@ -1,4 +1,5 @@
 # how to install: .venv/bin/pip install flask fastf1 pandas matplotlib numpy requests && .venv/bin/python app.py
+#i like the driver profile idea. however i want to showcase the driver's logo somehow in the championship standings. 
 from flask import Flask, render_template, url_for, redirect, flash, Response, request, abort
 import hashlib
 import fastf1
@@ -36,43 +37,43 @@ app = Flask(__name__)
 
 # Team Data for 2026 F1 Season (current drivers)
 TEAM_DATA = {
-    "Mercedes": {"color": "#00A19B", "logo": "assets/mercedes.png"},
-    "Red Bull": {"color": "#4781D7", "logo": "assets/redbull.png"},
-    "Ferrari": {"color": "#EF1A2D", "logo": "assets/ferrari.png"},
-    "McLaren": {"color": "#FF5800", "logo": "assets/mclaren.png"},
-    "Alpine": {"color": "#0075E0", "logo": "assets/alpine.png"},
-    "Aston Martin": {"color": "#002420", "logo": "assets/aston.png"},
-    "Williams": {"color": "#0033CC", "logo": "assets/williams.png"},
-    "Audi": {"color": "#00D4BE", "logo": "assets/audi.png"},
-    "Racing Bulls": {"color": "#6C98FF", "logo": "assets/racing_bulls.png"},
-    "Cadillac": {"color": "#FF00FF", "logo": "assets/cadillac.png"},
-    "Haas": {"color": "#B6BABD", "logo": "assets/haas.png"},
+    "Mercedes": {"color": "#00A19B", "logo": "images/teams/mercedes.png"},
+    "Red Bull": {"color": "#4781D7", "logo": "images/teams/redbull.png"},
+    "Ferrari": {"color": "#EF1A2D", "logo": "images/teams/ferrari.png"},
+    "McLaren": {"color": "#FF5800", "logo": "images/teams/mclaren.png"},
+    "Alpine": {"color": "#0075E0", "logo": "images/teams/alpine.png"},
+    "Aston Martin": {"color": "#002420", "logo": "images/teams/aston.png"},
+    "Williams": {"color": "#0033CC", "logo": "images/teams/williams.png"},
+    "Audi": {"color": "#00D4BE", "logo": "images/teams/audi.png"},
+    "Racing Bulls": {"color": "#6C98FF", "logo": "images/teams/racing_bulls.png"},
+    "Cadillac": {"color": "#FF00FF", "logo": "images/teams/cadillac.png"},
+    "Haas": {"color": "#B6BABD", "logo": "images/teams/haas.png"},
 }
 
 # Driver Data for 2026 F1 Season (current drivers)
 DRIVERS_DATA = [
-    {"name": "Charles Leclerc", "number": "16", "team": "Ferrari"},
-    {"name": "Alex Albon", "number": "23", "team": "Williams"},
-    {"name": "Fernando Alonso", "number": "14", "team": "Aston Martin"},
-    {"name": "Kimi Antonelli", "number": "12", "team": "Mercedes"},
-    {"name": "Oliver Bearman", "number": "87", "team": "Haas"},
-    {"name": "Gabriel Bortoleto", "number": "5", "team": "Audi"},
-    {"name": "Valtteri Bottas", "number": "77", "team": "Cadillac"},
-    {"name": "Franco Colapinto", "number": "43", "team": "Alpine"},
-    {"name": "Pierre Gasly", "number": "10", "team": "Alpine"},
-    {"name": "Isack Hadjar", "number": "6", "team": "Red Bull"},
-    {"name": "Lewis Hamilton", "number": "44", "team": "Ferrari"},
-    {"name": "Nico Hulkenberg", "number": "27", "team": "Audi"},
-    {"name": "Liam Lawson", "number": "30", "team": "Racing Bulls"},
-    {"name": "Arvid Lindblad", "number": "41", "team": "Racing Bulls"},
-    {"name": "Lando Norris", "number": "1", "team": "McLaren"},
-    {"name": "Esteban Ocon", "number": "31", "team": "Haas"},
-    {"name": "Sergio Perez", "number": "11", "team": "Cadillac"},
-    {"name": "Oscar Piastri", "number": "81", "team": "McLaren"},
-    {"name": "George Russell", "number": "63", "team": "Mercedes"},
-    {"name": "Carlos Sainz", "number": "55", "team": "Williams"},
-    {"name": "Lance Stroll", "number": "18", "team": "Aston Martin"},
-    {"name": "Max Verstappen", "number": "3", "team": "Red Bull"}
+    {"name": "Charles Leclerc", "number": "16", "team": "Ferrari", "logo": "images/drivers/leclercLogo.png"},
+    {"name": "Alex Albon", "number": "23", "team": "Williams", "logo": "images/drivers/albonLogo.png"},
+    {"name": "Fernando Alonso", "number": "14", "team": "Aston Martin", "logo": "images/drivers/alonsLogo.png"},
+    {"name": "Kimi Antonelli", "number": "12", "team": "Mercedes", "logo": "images/drivers/antonelliLogo.png"},
+    {"name": "Oliver Bearman", "number": "87", "team": "Haas", "logo": "images/drivers/bearmanLogo.png"},
+    {"name": "Gabriel Bortoleto", "number": "5", "team": "Audi", "logo": "images/drivers/bortoletoLogo.png"},
+    {"name": "Valtteri Bottas", "number": "77", "team": "Cadillac", "logo": "images/drivers/bottasLogo.png"},
+    {"name": "Franco Colapinto", "number": "43", "team": "Alpine", "logo": "images/drivers/colapintoLogo.png"},
+    {"name": "Pierre Gasly", "number": "10", "team": "Alpine", "logo": "images/drivers/gaslyLogo.png"},
+    {"name": "Isack Hadjar", "number": "6", "team": "Red Bull", "logo": "images/drivers/hadjarLogo.png"},
+    {"name": "Lewis Hamilton", "number": "44", "team": "Ferrari", "logo": "images/drivers/hamiltonLogo.png"},
+    {"name": "Nico Hulkenberg", "number": "27", "team": "Audi", "logo": "images/drivers/hulkenbergLogo.png"},
+    {"name": "Liam Lawson", "number": "30", "team": "Racing Bulls", "logo": "images/drivers/lawsonLogo.png"},
+    {"name":"Arvid Lindblad","number":"41","team":"Racing Bulls", "logo":"images/drivers/lindbladLogo.png"},
+    {"name":"Lando Norris","number":"1","team":"McLaren", "logo":"images/drivers/norrisLogo.png"},
+    {"name":"Esteban Ocon","number":"31","team":"Haas", "logo":"images/drivers/oconLogo.png"},
+    {"name": "Sergio Perez", "number": "11", "team": "Cadillac", "logo": "images/drivers/perezLogo.png"},
+    {"name": "Oscar Piastri", "number": "81", "team": "McLaren", "logo": "images/drivers/piastriLogo.png"},
+    {"name": "George Russell", "number": "63", "team": "Mercedes", "logo": "images/drivers/russellLogo.png"},
+    {"name": "Carlos Sainz", "number": "55", "team": "Williams", "logo": "images/drivers/sainzLogo.png"},
+    {"name": "Lance Stroll", "number": "18", "team": "Aston Martin", "logo": "images/drivers/strollLogo.png"},
+    {"name": "Max Verstappen", "number": "3", "team": "Red Bull", "logo": "images/drivers/verstappenLogo.png"},
 ]
 
 # Mapping of country names to ISO 3166-1 alpha-2 codes for flag emojis
@@ -501,7 +502,8 @@ def championship():
                 "team": d['Constructors'][0]['name'],
                 "team_color": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('color', '#9aa6b2'),
                 "logo": TEAM_DATA.get(d['Constructors'][0]['name'], {}).get('logo', ''),
-                "points": d['points']
+                "points": d['points'],
+                "number": d['Driver']['permanentNumber']
             }
             for d in drivers_raw
         ]
