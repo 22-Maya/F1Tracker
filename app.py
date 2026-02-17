@@ -15,6 +15,8 @@ import io
 import base64
 import os
 import logging
+import sys
+import subprocess
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -365,6 +367,76 @@ def race_view(year, gp_name):
                            gp_name=gp_name,
                            data_available=data_available,
                            track_info=event.get('Location', ''))
+
+
+@app.route("/replays")
+def replays():
+    """List past races found in the local FastF1 cache folder.
+    This scans `cache/` for event folders like `2025-03-16_Australian_Grand_Prix`.
+    """
+    cache_root = 'cache'
+    events = []
+    if os.path.exists(cache_root):
+        # Walk year directories (expect structure cache/<year>/<YYYY-MM-DD_EventName>/...)
+        for year_dir in sorted(os.listdir(cache_root), reverse=True):
+            year_path = os.path.join(cache_root, year_dir)
+            if not os.path.isdir(year_path):
+                continue
+            # look for event folders inside the year dir
+            for entry in sorted(os.listdir(year_path), reverse=True):
+                entry_path = os.path.join(year_path, entry)
+                if not os.path.isdir(entry_path):
+                    continue
+                # Expect folder name starts with date and underscore
+                # e.g. 2025-03-16_Australian_Grand_Prix
+                if len(entry) > 11 and entry[4] == '-' and entry[7] == '-' and entry[10] == '_':
+                    date_part = entry[0:10]
+                    gp_slug = entry[11:]
+                    display_name = gp_slug.replace('_', ' ')
+                    ev = {
+                        'year': year_dir,
+                        'gp_slug': gp_slug,
+                        'display_name': display_name,
+                        'date': date_part
+                    }
+                    # Attach metadata if present in replay/computed
+                    meta_path = os.path.join('replay', 'computed', f"{year_dir}_{gp_slug}_meta.json")
+                    if os.path.exists(meta_path):
+                        try:
+                            import json
+                            with open(meta_path, 'r', encoding='utf-8') as mf:
+                                ev['meta'] = json.load(mf)
+                        except Exception:
+                            ev['meta'] = None
+                    events.append(ev)
+    # sort by year/date descending
+    events = sorted(events, key=lambda e: (e['year'], e['date']), reverse=True)
+    return render_template('replays.html', events=events)
+
+
+@app.route('/replays/compute', methods=['POST'])
+def compute_replay_metadata():
+    year = request.form.get('year')
+    gp = request.form.get('gp')
+    if not year or not gp:
+        flash('Missing year or gp', 'error')
+        return redirect(url_for('replays'))
+
+    # Start background process to compute metadata
+    cmd = [sys.executable, os.path.join('replay', 'compute_metadata.py'), '--year', str(year), '--gp', gp]
+    try:
+        subprocess.Popen(cmd)
+        flash('Metadata computation started — refresh this page in a minute.', 'info')
+    except Exception as e:
+        flash(f'Failed to start computation: {e}', 'error')
+    return redirect(url_for('replays'))
+
+
+@app.route('/replay/<int:year>/<string:gp_name>')
+def replay_detail(year, gp_name):
+    # simple detail page that re-uses race_view info where possible
+    # gp_name here is expected to be the FastF1-style underscore name
+    return redirect(url_for('race_view', year=year, gp_name=gp_name))
 
 @app.route("/track_image/<int:year>/<string:gp_name>")
 def track_image(year, gp_name):

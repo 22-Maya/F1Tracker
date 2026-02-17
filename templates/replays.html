@@ -1,0 +1,54 @@
+{% extends "_macros.html" %}
+{% block content %}
+<div class="page">
+  <h1>Past Races</h1>
+  <p class="muted">Browse races found in your local FastF1 cache. Click a race to view track details or follow the command to play the replay locally.</p>
+
+  {% if events %}
+    <div class="replay-list">
+      {% for ev in events %}
+        <div class="replay-item">
+          <div class="replay-meta">
+            <div class="replay-title">{{ ev.display_name }}</div>
+            <div class="replay-sub">Year: {{ ev.year }} • Date: {{ ev.date }}</div>
+          </div>
+          <div class="replay-actions">
+            <a class="btn" href="{{ url_for('race_view', year=ev.year, gp_name=ev.gp_slug) }}">View Track</a>
+            <button class="btn secondary" onclick="showCmd('{{ ev.year }}','{{ ev.gp_slug }}')">Watch locally</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No cached races found in <strong>cache/</strong>. Try running the app once or placing FastF1 cache files into the <strong>cache/</strong> folder.</p>
+  {% endif %}
+
+  <hr>
+  <h2>Watch locally</h2>
+  <p class="muted">To watch a replay on this machine you can run the external replay viewer (if available). Below is the command to run from your project root. Replace <em>YEAR</em> and <em>ROUND</em> (or use the provided GP name if supported):</p>
+
+  <pre id="cmdblock" class="cmd">python replay/main.py --viewer --year YEAR --round ROUND</pre>
+  <p class="muted">If you haven't added the replay viewer into this project yet, I can scaffold it into a <strong>replay/</strong> folder for you.</p>
+
+</div>
+
+<script>
+function showCmd(year, gp) {
+  // show a helpful command using gp name
+  const cmd = `python replay/main.py --viewer --year ${year} --round 1 --gp \"${gp.replace(/_/g,' ')}\"`;
+  document.getElementById('cmdblock').textContent = cmd;
+  alert('Command updated — copy it from the page and run in a terminal.');
+}
+</script>
+
+<style>
+.page { padding: 24px; max-width: 1000px; margin: 0 auto; }
+.replay-list { display:flex; flex-direction:column; gap:12px; }
+.replay-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:8px; background:rgba(255,255,255,0.02); }
+.replay-title { font-weight:600; }
+.replay-sub { font-size:0.9rem; color:var(--muted); }
+.replay-actions .btn { margin-left:8px; }
+.cmd { background:#0b1220; color:#9aa6b2; padding:12px; border-radius:6px; }
+</style>
+
+{% endblock %}
