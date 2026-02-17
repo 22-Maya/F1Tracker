@@ -1,0 +1,27 @@
+{
+  "year": 2024,
+  "gp": "Abu_Dhabi_Grand_Prix",
+  "drivers": [
+    "NOR",
+    "SAI",
+    "LEC",
+    "HAM",
+    "RUS",
+    "VER",
+    "GAS",
+    "HUL",
+    "ALO",
+    "PIA",
+    "ALB",
+    "TSU",
+    "ZHO",
+    "STR",
+    "DOO",
+    "MAG",
+    "LAW",
+    "BOT",
+    "COL",
+    "PER"
+  ],
+  "total_laps": 58
+}
